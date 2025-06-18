@@ -83,3 +83,42 @@ The first proof-of-concept focuses on generating a 2D grid-based map using Perli
 > - The Zone generation rules is not implemented yet.
 
 This prototype demonstrates the foundation of a rule-based procedural generation engine - where terrain is shaped not just randomly, but intentionally, to support interesting gameplay scenarios.
+
+
+## Upgraded Prototype - 2D Terrain Map v0.2
+
+Here is what we have been doing till now:
+
+```cpp
+// Init TileMap and ZonePlanner
+TileMap tileMap(MAP_WIDTH, MAP_HEIGHT);
+ZonePlanner planner(MAP_WIDTH, MAP_HEIGHT, ZONE_SIZE);
+
+// Generate the zone layout
+auto zones = planner.planZones();
+
+// Generate terrain for each zone
+for (auto& zone : zones) {
+	zone.generate(tileMap);
+}
+```
+
+The terrain elevation was generated within each zone independently. While this worked for local variation, it led to discontinuities at zone boundaries, resulting in an unnatural, fragmented look.
+
+## What is new?
+
+To ensure smooth, continuous terrain across the entire map, the elevation is now generated globally first using a noise function. Zones are then planned on top of this elevation map using strategic heuristics.
+
+```cpp
+// Initialize the tile map with specified dimensions
+TileMap tileMap(MAP_WIDTH, MAP_HEIGHT);
+
+// Generate random terrain for the tile map
+tileMap.generateGlobalHeightMap();
+
+// Plan the zones based on the generated terrain
+ZonePlanner planner(MAP_WIDTH, MAP_HEIGHT, ZONE_SIZE);
+auto zones = planner.planZones(tileMap);
+```
+
+This change preserves the strengths of rule-based zone placement while grounding it in a realistic, seamless terrain foundation essential for gameplay immersion and navigability.
