@@ -43,7 +43,7 @@ void TileMap::applyZones(const std::vector<Zone>& zones) {
 
 void TileMap::exportZoneMapAsPNG(const std::string& path) {
     std::vector<uint8_t> image(width_ * height_ * 3); // RGB
-    
+
     for (int y = 0; y < height_; ++y) {
         for (int x = 0; x < width_; ++x) {
             auto [r, g, b] = zoneToColor(tiles_[y][x].zone_type);
@@ -71,4 +71,26 @@ void TileMap::exportTerrainMapAsPNG(const std::string& path) {
     }
 
     stbi_write_png(path.c_str(), width_, height_, 1, image.data(), width_);
+}
+
+void TileMap::exportOverlayTerrainMap(const std::string& path) {
+    std::vector<uint8_t> image(width_ * height_ * 3); // RGB
+
+    for (int y = 0; y < height_; ++y) {
+        for (int x = 0; x < width_; ++x) {
+            const Tile& tile = get(x, y);
+
+            // Base grayscale from height
+            uint8_t gray = static_cast<uint8_t>((tile.height + 1.0f) * 127.5f);
+            auto [zr, zg, zb] = zoneToColor(tile.zone_type);
+
+            // Blend zone color (30%) with terrain gray (70%)
+            int idx = (y * width_ + x) * 3;
+            image[idx] = static_cast<uint8_t>(0.7f * gray + 0.3f * zr);
+            image[idx + 1] = static_cast<uint8_t>(0.7f * gray + 0.3f * zg);
+            image[idx + 2] = static_cast<uint8_t>(0.7f * gray + 0.3f * zb);
+        }
+    }
+
+    stbi_write_png(path.c_str(), width_, height_, 3, image.data(), width_ * 3);
 }
