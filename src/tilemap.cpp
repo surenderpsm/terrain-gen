@@ -1,6 +1,8 @@
 #include "tilemap.hpp"
 #include <fstream>
 
+#include <FastNoiseLite.h>
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
@@ -9,8 +11,34 @@ TileMap::TileMap(int width, int height)
     : width_(width), height_(height), tiles_(height, std::vector<Tile>(width)) {
 }
 
-Tile& TileMap::get(int x, int y) {
+const Tile& TileMap::get(int x, int y) const{
     return tiles_[y][x];
+}
+
+void TileMap::generateGlobalHeightMap(float frequency) {
+    FastNoiseLite noise;
+    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    noise.SetFrequency(frequency);
+
+
+    for (int y = 0; y < height_; ++y) {
+        for (int x = 0; x < width_; ++x) {
+            Tile& tile = tiles_[y][x];
+            tile.height = noise.GetNoise((float)x,(float)y);
+        }
+    }
+}
+
+void TileMap::applyZones(const std::vector<Zone>& zones) {
+    for (const auto& zone : zones) {
+        for (int y = zone.y_start; y < zone.y_start + zone.size; ++y) {
+            for (int x = zone.x_start; x < zone.x_start + zone.size; ++x) {
+                if (x >= 0 && x < width_ && y >= 0 && y < height_) {
+                    tiles_[y][x].zone_type = zone.type;
+                }
+            }
+        }
+    }
 }
 
 void TileMap::exportZoneMapAsPNG(const std::string& path) {
