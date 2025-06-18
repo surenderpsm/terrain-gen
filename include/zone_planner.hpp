@@ -4,14 +4,11 @@
 #include "tilemap.hpp"
 #include <functional>
 
+// a lambda to define heuristics for assigning ZoneTypes
+using ZoneStrategy = std::function<ZoneType(float avg_height, float stddev, int x, int y)>;
 
 class ZonePlanner {
 public:
-
-    // a lambda to define heuristics for assigning ZoneTypes
-    using ZoneStrategy = std::function<ZoneType(float avg_height, float stddev, int x, int y)>;
-
-
     ZonePlanner(int map_width, int map_height, int zone_size);
 	// legacy: remove in future versions
     std::vector<Zone> planZones();
