@@ -21,6 +21,25 @@ A montage of generated terrains with overlay labels defining each zone. For vari
 
 
 
+## Current Features
+
+A prototype for rule-based procedural terrain generation aimed at FPS or tactical game map design. This project uses Perlin noise and custom heuristics to create terrain-aware strategic zones like arenas, flanks, and chokepoints.
+
+Current features include:
+
+* ✅ **Global heightmap generation** using Perlin noise
+* ✅ **Rule-based zone assignment** based on terrain stats (e.g., elevation, position)
+* ✅ **2D visualizations** of terrain (`terrain_map.png`), zone layout (`zone_map.png`), and combined overlay (`overlay_map.png`)
+* ✅ **Modular architecture**: clearly separated components (`Tile`, `Zone`, `TileMap`, `ZonePlanner`)
+* ✅ **Customizable zone heuristics** via strategy lambdas
+* ✅ **Exportable debug artifacts** for map tuning and comparison
+
+> ❌ Not included in current prototype:
+>
+> * 3D mesh rendering
+> * OpenGL real-time terrain rendering
+> * Interactive camera or gameplay loop
+
 
 ## Goals
 A real-time terrain generation demo using C++ and OpenGL.
