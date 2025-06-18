@@ -1,10 +1,15 @@
 #pragma once
-#include "tilemap.hpp"
-#include "tile.hpp"
+
+enum class ZoneType;
+
 
 struct Zone {
     ZoneType type;
     int x_start, y_start, size;
 
-    void generate(TileMap& map);
+    Zone() {};
+
+    Zone(int x, int y, int size, ZoneType type)
+        : x_start(x), y_start(y), size(size), type(type) {
+    }
 };

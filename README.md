@@ -4,6 +4,24 @@
 
 Most FPS games today rely on hand-crafted maps: predictable, static, and prone to memorization. But what if maps could evolve? This project explores rule-based procedural terrain generation, where strategic zones (arenas, chokes, flanks) are assembled intelligently using noise and spatial rules. The goal: maps that are both fresh and tactically rich, without sacrificing gameplay balance.
 
+## Demo
+
+![gif demo](https://github.com/user-attachments/assets/7350cb92-4c7c-43e4-8f2f-00806b88ce43)
+
+A montage of generated terrains with overlay labels defining each zone. For various frequencies using `BasicStrategy`
+| Zone Type     | Color  | Description                                                 |
+| ------------- | ------ | ----------------------------------------------------------- |
+| `ARENA`       | Green 🟩    | Balanced open combat area - ideal for primary engagements.  |
+| `CHOKE`       | Red   🟥    | Tight, narrow paths forcing close combat.                   |
+| `FLANK`       | Blue  🟦    | Side routes for surprise attacks and sneaky plays.          |
+| `HIGH_GROUND` | Purple 🟪    | Elevated terrain giving visibility and cover advantage.     |
+| `SPAWN`       | Yellow 🟨    | Player spawn zones, usually at corners or safe zones.       |
+| `OBJECTIVE`   | Orange 🟧    | Central map goals: capture points, bombs, etc.              |
+| `UNASSIGNED`  | Gray   ⬜     | Default/fallback tile - not assigned to any strategic role. |
+
+
+
+
 ## Goals
 A real-time terrain generation demo using C++ and OpenGL.
 This project visualizes large-scale, procedurally generated landscapes using Perlin noise and fractal algorithms. Features include:
@@ -83,3 +101,57 @@ The first proof-of-concept focuses on generating a 2D grid-based map using Perli
 > - The Zone generation rules is not implemented yet.
 
 This prototype demonstrates the foundation of a rule-based procedural generation engine - where terrain is shaped not just randomly, but intentionally, to support interesting gameplay scenarios.
+
+
+## Upgraded Prototype - 2D Terrain Map v0.2
+
+Here is what we have been doing till now:
+
+```cpp
+// Init TileMap and ZonePlanner
+TileMap tileMap(MAP_WIDTH, MAP_HEIGHT);
+ZonePlanner planner(MAP_WIDTH, MAP_HEIGHT, ZONE_SIZE);
+
+// Generate the zone layout
+auto zones = planner.planZones();
+
+// Generate terrain for each zone
+for (auto& zone : zones) {
+	zone.generate(tileMap);
+}
+```
+
+The terrain elevation was generated within each zone independently. While this worked for local variation, it led to discontinuities at zone boundaries, resulting in an unnatural, fragmented look.
+
+## What is new?
+
+Terrain generation and zone planning have been decoupled for better control and realism. Instead of generating terrain separately inside each zone, we now produce a global heightmap first using Perlin noise. This ensures smooth, continuous elevation across the entire map.
+
+Once the terrain is in place, zones are assigned on top of the terrain using rule-based heuristics. These heuristics take into account elevation patterns and spatial location to assign appropriate zone types (e.g., choke, flank, high ground, arena).
+
+```cpp
+    // Define a strategy
+    auto basicStrategy = [&](float avg, float stddev, int x, int y) -> ZoneType {
+        if (avg > 0.6f) return ZoneType::HIGH_GROUND;
+        if (avg < -0.4f) return ZoneType::CHOKE;
+        if ((x < MAP_WIDTH / 4 || x > 3 * MAP_WIDTH / 4) ||
+            (y < MAP_HEIGHT / 4 || y > 3 * MAP_HEIGHT / 4)) return ZoneType::FLANK;
+        return ZoneType::ARENA;
+    };
+
+	// Initialize the tile map with specified dimensions
+    TileMap tileMap(MAP_WIDTH, MAP_HEIGHT);
+
+	// Generate random terrain for the tile map
+    tileMap.generateGlobalHeightMap();
+
+	// Plan the zones based on the generated terrain and strategy
+    ZonePlanner planner(MAP_WIDTH, MAP_HEIGHT, ZONE_SIZE);
+    auto zones = planner.planZones(tileMap, basicStrategy);
+
+    // TileMap applies the zone
+    tileMap.applyZones(zones);
+```
+
+This change preserves the strengths of rule-based zone placement while grounding it in a realistic, seamless terrain foundation essential for gameplay immersion and navigability.
+
