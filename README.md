@@ -19,6 +19,11 @@ A montage of generated terrains with overlay labels defining each zone. For vari
 | `OBJECTIVE`   | Orange 🟧    | Central map goals: capture points, bombs, etc.              |
 | `UNASSIGNED`  | Gray   ⬜     | Default/fallback tile - not assigned to any strategic role. |
 
+Here are some more zone distribution maps generated from another Strategy:
+
+![Image](https://github.com/user-attachments/assets/4fd88810-0a5b-4bbd-a12d-0a5d1e0995f5)
+
+![Image](https://github.com/user-attachments/assets/74fe7f2d-6e59-4aba-9014-4c20ebf34f1a)
 
 
 ## Current Features
