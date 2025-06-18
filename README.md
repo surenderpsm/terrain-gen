@@ -4,6 +4,24 @@
 
 Most FPS games today rely on hand-crafted maps: predictable, static, and prone to memorization. But what if maps could evolve? This project explores rule-based procedural terrain generation, where strategic zones (arenas, chokes, flanks) are assembled intelligently using noise and spatial rules. The goal: maps that are both fresh and tactically rich, without sacrificing gameplay balance.
 
+## Demo
+
+![gif demo](https://github.com/user-attachments/assets/7350cb92-4c7c-43e4-8f2f-00806b88ce43)
+
+A montage of generated terrains with overlay labels defining each zone.
+| Zone Type     | Color  | Description                                                 |
+| ------------- | ------ | ----------------------------------------------------------- |
+| `ARENA`       | Green 🟩    | Balanced open combat area - ideal for primary engagements.  |
+| `CHOKE`       | Red   🟥    | Tight, narrow paths forcing close combat.                   |
+| `FLANK`       | Blue  🟦    | Side routes for surprise attacks and sneaky plays.          |
+| `HIGH_GROUND` | Purple 🟪    | Elevated terrain giving visibility and cover advantage.     |
+| `SPAWN`       | Yellow 🟨    | Player spawn zones, usually at corners or safe zones.       |
+| `OBJECTIVE`   | Orange 🟧    | Central map goals: capture points, bombs, etc.              |
+| `UNASSIGNED`  | Gray   ⬜     | Default/fallback tile - not assigned to any strategic role. |
+
+
+
+
 ## Goals
 A real-time terrain generation demo using C++ and OpenGL.
 This project visualizes large-scale, procedurally generated landscapes using Perlin noise and fractal algorithms. Features include:
@@ -136,3 +154,4 @@ Once the terrain is in place, zones are assigned on top of the terrain using rul
 ```
 
 This change preserves the strengths of rule-based zone placement while grounding it in a realistic, seamless terrain foundation essential for gameplay immersion and navigability.
+
