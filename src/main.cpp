@@ -28,10 +28,11 @@ int main() {
 	// Generate random terrain for the tile map
     tileMap.generateGlobalHeightMap();
 
-	// Plan the zones based on the generated terrain
+	// Plan the zones based on the generated terrain and strategy
     ZonePlanner planner(MAP_WIDTH, MAP_HEIGHT, ZONE_SIZE);
     auto zones = planner.planZones(tileMap, basicStrategy);
 
+    // TileMap applies the zone
     tileMap.applyZones(zones);
 
 	// view zone distribution

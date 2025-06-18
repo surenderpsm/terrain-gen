@@ -107,18 +107,32 @@ The terrain elevation was generated within each zone independently. While this w
 
 ## What is new?
 
-To ensure smooth, continuous terrain across the entire map, the elevation is now generated globally first using a noise function. Zones are then planned on top of this elevation map using strategic heuristics.
+Terrain generation and zone planning have been decoupled for better control and realism. Instead of generating terrain separately inside each zone, we now produce a global heightmap first using Perlin noise. This ensures smooth, continuous elevation across the entire map.
+
+Once the terrain is in place, zones are assigned on top of the terrain using rule-based heuristics. These heuristics take into account elevation patterns and spatial location to assign appropriate zone types (e.g., choke, flank, high ground, arena).
 
 ```cpp
-// Initialize the tile map with specified dimensions
-TileMap tileMap(MAP_WIDTH, MAP_HEIGHT);
+    // Define a strategy
+    auto basicStrategy = [&](float avg, float stddev, int x, int y) -> ZoneType {
+        if (avg > 0.6f) return ZoneType::HIGH_GROUND;
+        if (avg < -0.4f) return ZoneType::CHOKE;
+        if ((x < MAP_WIDTH / 4 || x > 3 * MAP_WIDTH / 4) ||
+            (y < MAP_HEIGHT / 4 || y > 3 * MAP_HEIGHT / 4)) return ZoneType::FLANK;
+        return ZoneType::ARENA;
+    };
 
-// Generate random terrain for the tile map
-tileMap.generateGlobalHeightMap();
+	// Initialize the tile map with specified dimensions
+    TileMap tileMap(MAP_WIDTH, MAP_HEIGHT);
 
-// Plan the zones based on the generated terrain
-ZonePlanner planner(MAP_WIDTH, MAP_HEIGHT, ZONE_SIZE);
-auto zones = planner.planZones(tileMap);
+	// Generate random terrain for the tile map
+    tileMap.generateGlobalHeightMap();
+
+	// Plan the zones based on the generated terrain and strategy
+    ZonePlanner planner(MAP_WIDTH, MAP_HEIGHT, ZONE_SIZE);
+    auto zones = planner.planZones(tileMap, basicStrategy);
+
+    // TileMap applies the zone
+    tileMap.applyZones(zones);
 ```
 
 This change preserves the strengths of rule-based zone placement while grounding it in a realistic, seamless terrain foundation essential for gameplay immersion and navigability.
