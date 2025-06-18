@@ -59,33 +59,41 @@ int main() {
 
     // Define a strategy
     auto basicStrategy = [&](float avg, float stddev, int x, int y) -> ZoneType {
-        if (avg > 0.6f) return ZoneType::HIGH_GROUND;
-        if (avg < -0.4f) return ZoneType::CHOKE;
+        if (avg > 0.6f) return ZoneType::HIGH_GROUND; //PURPLE
+        if (avg < -0.4f) return ZoneType::CHOKE; // RED
         if ((x < MAP_WIDTH / 4 || x > 3 * MAP_WIDTH / 4) ||
-            (y < MAP_HEIGHT / 4 || y > 3 * MAP_HEIGHT / 4)) return ZoneType::FLANK;
-        return ZoneType::ARENA;
+            (y < MAP_HEIGHT / 4 || y > 3 * MAP_HEIGHT / 4)) return ZoneType::FLANK; // BLUE
+        return ZoneType::ARENA; // GREEN
     };
 
-	// Initialize the tile map with specified dimensions
-    TileMap tileMap(MAP_WIDTH, MAP_HEIGHT);
+    auto fullStrategy = [&](float avg, float stddev, int x, int y) -> ZoneType {
+        // Objectives near the center
+        if ((x > MAP_WIDTH / 2 - 16 && x < MAP_WIDTH / 2 + 16) &&
+            (y > MAP_HEIGHT / 2 - 16 && y < MAP_HEIGHT / 2 + 16))
+            return ZoneType::OBJECTIVE;
 
-	// Generate random terrain for the tile map
-    tileMap.generateGlobalHeightMap();
+        // High ground by height
+        if (avg > 0.6f)
+            return ZoneType::HIGH_GROUND;
 
-	// Plan the zones based on the generated terrain and strategy
-    ZonePlanner planner(MAP_WIDTH, MAP_HEIGHT, ZONE_SIZE);
-    auto zones = planner.planZones(tileMap, basicStrategy);
+        // Choke points: valleys with low deviation (traps)
+        if (avg < -0.4f && stddev < 0.05f)
+            return ZoneType::CHOKE;
 
-    // TileMap applies the zone
-    tileMap.applyZones(zones);
+        // Flanks: near map edges
+        if ((x < MAP_WIDTH / 6 || x > 5 * MAP_WIDTH / 6) ||
+            (y < MAP_HEIGHT / 6 || y > 5 * MAP_HEIGHT / 6))
+            return ZoneType::FLANK;
 
-	// view zone distribution
-    tileMap.exportZoneMapAsPNG("zone_map.png");
-    std::cout << "Zone Map written to zone_map.png\n";
+        // Spawn zones in corners
+        if ((x < MAP_WIDTH / 8 && y < MAP_HEIGHT / 8) ||
+            (x > 7 * MAP_WIDTH / 8 && y > 7 * MAP_HEIGHT / 8))
+            return ZoneType::SPAWN;
 
-    // view terrain elevation
-	tileMap.exportTerrainMapAsPNG("terrain_map.png");
-    std::cout << "Grayscale Terrain Map written to terrain_map.png\n";
+        // Default combat zone
+        return ZoneType::ARENA;
+        };
+
 
     float minf = 0.001f, maxf = 0.5, inc = 0.0001f;
     for (int index = 0; index < static_cast<int>((maxf - minf) / inc); ++index) {
