@@ -8,7 +8,7 @@ Most FPS games today rely on hand-crafted maps: predictable, static, and prone t
 
 ![gif demo](https://github.com/user-attachments/assets/7350cb92-4c7c-43e4-8f2f-00806b88ce43)
 
-A montage of generated terrains with overlay labels defining each zone.
+A montage of generated terrains with overlay labels defining each zone. For various frequencies using `BasicStrategy`
 | Zone Type     | Color  | Description                                                 |
 | ------------- | ------ | ----------------------------------------------------------- |
 | `ARENA`       | Green 🟩    | Balanced open combat area - ideal for primary engagements.  |
