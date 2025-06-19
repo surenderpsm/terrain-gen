@@ -1,5 +1,6 @@
 #include "tilemap.hpp"
 #include <fstream>
+#include "noise_utils.hpp"
 
 #include <FastNoiseLite.h>
 
@@ -15,6 +16,22 @@ const Tile& TileMap::get(int x, int y) const{
     return tiles_[y][x];
 }
 
+
+void TileMap::generateGlobalHeightMap(float frequency, int octaves, float persistence) {
+    FastNoiseLite noise;
+    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    noise.SetFrequency(frequency);
+
+
+    for (int y = 0; y < height_; ++y) {
+        for (int x = 0; x < width_; ++x) {
+            Tile& tile = tiles_[y][x];
+            tile.height = fbm_noise(noise, (float)x, (float)y, octaves, persistence);
+        }
+    }
+}
+
+// legacy function for compatibility
 void TileMap::generateGlobalHeightMap(float frequency) {
     FastNoiseLite noise;
     noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
