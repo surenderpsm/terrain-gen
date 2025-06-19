@@ -22,6 +22,7 @@ public:
     const Tile& get(int x, int y) const;
     void generateGlobalHeightMap(float frequency = 0.02f, int octaves = 4, float persistence = 0.5f);
     void generateGlobalHeightMap(float frequency=0.02f);
+    std::pair<float, float> computeGlobalStats() const;
     void applyZones(const std::vector<Zone>& zones);
     void exportZoneMapAsPNG(const std::string& path);
 	void exportTerrainMapAsPNG(const std::string& path);

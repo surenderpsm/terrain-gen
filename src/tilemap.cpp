@@ -111,3 +111,20 @@ void TileMap::exportOverlayTerrainMap(const std::string& path) {
 
     stbi_write_png(path.c_str(), width_, height_, 3, image.data(), width_ * 3);
 }
+
+std::pair<float, float> TileMap::computeGlobalStats() const {
+    float sum = 0.0f, sumSq = 0.0f;
+    int count = width_ * height_;
+
+    for (const auto& row : tiles_) {
+        for (const auto& tile : row) {
+            sum += tile.height;
+            sumSq += tile.height * tile.height;
+        }
+    }
+
+    float mean = sum / count;
+    float variance = (sumSq / count) - (mean * mean);
+    float stddev = std::sqrt(variance);
+    return { mean, stddev };
+}
