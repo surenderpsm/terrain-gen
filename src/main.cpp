@@ -19,7 +19,7 @@ void run_pipeline(
     TileMap tileMap(MAP_WIDTH, MAP_HEIGHT);
 
     // Generate random terrain for the tile map
-    tileMap.generateGlobalHeightMap(frequency);
+    tileMap.generateGlobalHeightMap(frequency, 4, 0.5);
 
     // Plan the zones based on the generated terrain and strategy
     ZonePlanner planner(MAP_WIDTH, MAP_HEIGHT, ZONE_SIZE);
@@ -95,7 +95,8 @@ int main() {
         };
 
 
-    float minf = 0.001f, maxf = 0.5, inc = 0.0001f;
+
+    float minf = 0.011f, maxf = 0.02, inc = 0.005f;
     for (int index = 0; index < static_cast<int>((maxf - minf) / inc); ++index) {
         float FREQUENCY = minf + index * inc;
         run_pipeline(index, MAP_WIDTH, MAP_HEIGHT, ZONE_SIZE, basicStrategy, FREQUENCY, output_dir);
