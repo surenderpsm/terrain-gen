@@ -2,8 +2,6 @@
 #include <fstream>
 #include "noise_utils.hpp"
 
-#include <FastNoiseLite.h>
-
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
