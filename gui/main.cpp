@@ -7,9 +7,15 @@
 #include "tilemap.hpp"
 #include "zone_planner.hpp"
 #include<iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 
-
+enum UPDATE_TYPE {
+    UPDATE_NONE = 0,
+    UPDATE_MESH = 1 << 0,
+    UPDATE_SHADER = 1 << 1,
+    UPDATE_ALL = UPDATE_MESH | UPDATE_SHADER
+};
 
 // Globals
 int gScreenWidth = 1920;
@@ -41,7 +47,9 @@ void cleanup() {
 }
 
 int main() {
-
+    struct Light light;
+	struct Material material;
+	struct FBMParams fbm;
 	initializeGLFW();
 
 
@@ -70,13 +78,14 @@ int main() {
     auto zones = planner.planZones(tileMap, your_strategy_here);
     tileMap.applyZones(zones);*/
 
-    TerrainRenderer renderer;
-    renderer.initFromTileMap(tileMap);
+    TerrainRenderer renderer(tileMap);
+    renderer.init();
 
 
 
     // Main loop
     while (!glfwWindowShouldClose(gWindow)) {
+        int updateFlags = UPDATE_NONE;
         glfwPollEvents();
 
         ImGui_ImplOpenGL3_NewFrame();
@@ -84,9 +93,19 @@ int main() {
         ImGui::NewFrame();
 
 
-        ImGui::Begin("Controls");
-        ImGui::Text("Basic controls go here");
+        ImGui::Begin("Texture Controls");
+		ImGui::SeparatorText("Light Settings");
+		if (ImGui::ColorEdit3("Light Color", glm::value_ptr(light.color))) updateFlags |= UPDATE_SHADER;
+        if (ImGui::SliderFloat3("Light Position", glm::value_ptr(light.position), 0.0f, 1024.0f)) updateFlags |= UPDATE_SHADER;
+
+       
+		ImGui::SeparatorText("Material Settings");
+        if (ImGui::ColorEdit3("Diffuse", glm::value_ptr(material.diffuse))) updateFlags |= UPDATE_SHADER;
+        if (ImGui::ColorEdit3("Specular", glm::value_ptr(material.specular))) updateFlags |= UPDATE_SHADER;
+        if (ImGui::SliderFloat("Shininess", &material.shininess, 1.0f, 128.0f)) updateFlags |= UPDATE_SHADER;
+
         ImGui::End();
+
 
         int w, h;
         glfwGetFramebufferSize(gWindow, &w, &h);
@@ -94,7 +113,16 @@ int main() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        renderer.draw();
+        if (updateFlags & UPDATE_SHADER) {
+            renderer.updateShader(light, material);
+		}
+        else if (updateFlags & UPDATE_MESH) {
+            renderer.updateMesh(tileMap);
+		}
+        else if (updateFlags & UPDATE_ALL) {
+			renderer.updateAll(tileMap, light, material);   
+        }
+        renderer.draw(material, light);
 
 
         ImGui::Render();
