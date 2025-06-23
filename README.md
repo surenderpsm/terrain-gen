@@ -6,6 +6,25 @@ Most FPS games today rely on hand-crafted maps: predictable, static, and prone t
 
 ## Demo
 
+## GUI Preview
+
+An early OpenGL-based GUI has been added for real-time visualization.
+
+### Implemented:
+- Middle-click + drag to pan the terrain
+- Scroll to zoom (camera moves forward/back)
+- 3D rendering of terrain mesh with basic lighting
+- Color-coded strategic zones (arena, flank, choke, etc.)
+
+![GUI Screenshot](docs/GUIv1.png)
+
+> Useful for inspecting terrain structure and zone placement dynamically. More interactivity (like ImGui tweaking and wireframe mode) is planned.
+
+
+[Here is a video link to a short demo.](https://github.com/user-attachments/assets/8b229098-9080-4e5a-a67f-495d3f0bd58c)
+
+## CLI interface
+
 ![gif demo](https://github.com/user-attachments/assets/7350cb92-4c7c-43e4-8f2f-00806b88ce43)
 
 A montage of generated terrains with overlay labels defining each zone. For various frequencies using `BasicStrategy`
@@ -38,10 +57,6 @@ Current features include:
 * ✅ **Modular architecture**: clearly separated components (`Tile`, `Zone`, `TileMap`, `ZonePlanner`)
 * ✅ **Customizable zone heuristics** via strategy lambdas
 * ✅ **Exportable debug artifacts** for map tuning and comparison
-
-> ❌ Not included in current prototype:
->
-> * 3D mesh rendering
 > * OpenGL real-time terrain rendering
 > * Interactive camera or gameplay loop
 
