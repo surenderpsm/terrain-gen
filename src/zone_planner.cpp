@@ -1,5 +1,5 @@
 #include "zone_planner.hpp"
-
+#include <cmath>
 
 ZonePlanner::ZonePlanner(int map_width, int map_height, int zone_size) :
     width_(map_width),

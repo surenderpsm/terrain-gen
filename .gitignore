@@ -4,3 +4,8 @@
 
 /.vs
 /out/build/x64-Debug
+
+# Linux
+build/
+.vscode/
+imgui.ini

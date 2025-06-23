@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <tuple>
 #include <string>
 #include "tile.hpp"
 #include "zone.hpp"
@@ -19,6 +20,8 @@ inline std::tuple<uint8_t, uint8_t, uint8_t> zoneToColor(ZoneType type) {
 class TileMap {
 public:
     TileMap(int width, int height);
+	const int getHeight() const { return height_; }
+	const int getWidth() const { return width_; }
     const Tile& get(int x, int y) const;
     void generateGlobalHeightMap(float frequency = 0.02f, int octaves = 4, float persistence = 0.5f);
     void generateGlobalHeightMap(float frequency=0.02f);
