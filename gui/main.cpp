@@ -9,6 +9,8 @@
 #include<iostream>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <viewport_navigator.hpp>
+
 
 enum UPDATE_TYPE {
     UPDATE_NONE = 0,
@@ -47,11 +49,38 @@ void cleanup() {
 }
 
 int main() {
+    // editable ImGUI controls
     struct Light light;
 	struct Material material;
 	struct FBMParams fbm;
+    struct Camera camera;
+
+    ViewNavigator vn;
+
+
 	initializeGLFW();
 
+    // Set controller pointer
+    glfwSetWindowUserPointer(gWindow, &vn);
+
+    glfwSetScrollCallback(gWindow, [](GLFWwindow* win, double xoffset, double yoffset) {
+    auto* ctrl = static_cast<ViewNavigator*>(glfwGetWindowUserPointer(win));
+    if (!ImGui::GetIO().WantCaptureMouse)
+        ctrl->handleScroll(yoffset); // xoffset is side-scroll, we ignore it
+    });
+
+
+    glfwSetMouseButtonCallback(gWindow, [](GLFWwindow* win, int button, int action, int mods) {
+        auto* ctrl = static_cast<ViewNavigator*>(glfwGetWindowUserPointer(win));
+        if (!ImGui::GetIO().WantCaptureMouse)
+            ctrl->handleMouseButton(button, action);
+    });
+
+    glfwSetCursorPosCallback(gWindow, [](GLFWwindow* win, double xpos, double ypos) {
+        auto* ctrl = static_cast<ViewNavigator*>(glfwGetWindowUserPointer(win));
+        if (!ImGui::GetIO().WantCaptureMouse)
+            ctrl->handleCursor(xpos, ypos);
+    });
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD" << std::endl;
@@ -67,10 +96,12 @@ int main() {
     ImGui_ImplGlfw_InitForOpenGL(gWindow, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    // Load data + renderer
-    constexpr int MAP_WIDTH = 512;
-	constexpr int MAP_HEIGHT = 512;
+    // @todo need to make imgui controls
+    constexpr int MAP_WIDTH = 1024;
+	constexpr int MAP_HEIGHT = 1024;
 	//constexpr int ZONE_SIZE = 64; // Size of each zone in the tilemap
+
+
     TileMap tileMap(MAP_WIDTH, MAP_HEIGHT);
     tileMap.generateGlobalHeightMap(0.02, 4, 0.5);
 
@@ -79,7 +110,6 @@ int main() {
     tileMap.applyZones(zones);*/
 
     TerrainRenderer renderer(tileMap);
-    renderer.init();
 
 
 
@@ -114,15 +144,16 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (updateFlags & UPDATE_SHADER) {
-            renderer.updateShader(light, material);
+            renderer.updateShader(material, light);
 		}
         else if (updateFlags & UPDATE_MESH) {
-            renderer.updateMesh(tileMap);
+            renderer.updateMesh(fbm);
 		}
         else if (updateFlags & UPDATE_ALL) {
-			renderer.updateAll(tileMap, light, material);   
+			renderer.updateMesh(fbm);
+            renderer.updateShader(material, light);   
         }
-        renderer.draw(material, light);
+        renderer.draw(vn.getCamera(), w, h);
 
 
         ImGui::Render();
