@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
+set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Disable Wayland support for GLFW")
 project(TerrainGen)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -30,7 +31,12 @@ add_library(glad STATIC external/glad/src/glad.c)
 target_include_directories(glad PUBLIC external/glad/include)
 
 # ImGui
-add_subdirectory(external/imgui)
+set(IMGUI_SRC
+    external/imgui/imgui.cpp
+    external/imgui/imgui_draw.cpp
+    external/imgui/imgui_widgets.cpp
+    external/imgui/imgui_tables.cpp
+)
 
 # GLFW
 add_subdirectory(external/glfw)
@@ -39,7 +45,9 @@ add_subdirectory(external/glfw)
 add_executable(terrain_gui
     ${PROJECT_SOURCE_DIR}/gui/main.cpp
     ${PROJECT_SOURCE_DIR}/gui/terrain_renderer.cpp
+    ${PROJECT_SOURCE_DIR}/gui/viewport_navigator.cpp
     ${COMMON_SRC}
+    ${IMGUI_SRC}
     external/imgui/backends/imgui_impl_glfw.cpp
     external/imgui/backends/imgui_impl_opengl3.cpp
  "gui/shader.cpp")
@@ -57,7 +65,6 @@ find_package(OpenGL REQUIRED)
 target_link_libraries(terrain_gui
     glad
     glfw
-    imgui
     OpenGL::GL
 )
 
